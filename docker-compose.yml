@@ -1,0 +1,35 @@
+rabbit1:
+    image: rabbitmq
+    net: bridge
+    dns: 127.0.0.1
+    ports:
+        - "15674:15672"
+    volumes:
+        - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
+        - /etc/consul/consul-join.json:/consul/join.json
+        - /etc/consul/consul-client.json:/consul/client.json
+    hostname: rabbit1
+    environment:
+        RABBITMQ_DEFAULT_PASS: guest
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_CLUSTER_MEMBER: rabbit1
+        RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
+        RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
+
+rabbit2:
+    image: rabbitmq
+    net: bridge
+    dns: 127.0.0.1
+    ports:
+        - "15675:15672"
+    volumes:
+        - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
+        - /etc/consul/consul-join.json:/consul/join.json
+        - /etc/consul/consul-client.json:/consul/client.json
+    hostname: rabbit2
+    environment:
+        RABBITMQ_DEFAULT_PASS: guest
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_CLUSTER_MEMBER: rabbit2
+        RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
+        RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
