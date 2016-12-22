@@ -23,7 +23,7 @@ fi
 
 if [ -n "$RABBITMQ_JOIN_CLUSTER" ]; then
     for rabbit in $(echo $RABBITMQ_JOIN_CLUSTER | tr "," "\n"); do
-        RABBITIP=`dig $rabbit.service.consul +short`
+        RABBITIP=`dig +time=1 +tries=3 $rabbit.service.consul +short`
         if [ -n "$RABBITIP" ]; then
             echo "$RABBITIP $rabbit $rabbit.service.consul" >> /etc/hosts;
             export RABBIT_TO_JOIN=$rabbit
@@ -34,6 +34,7 @@ fi
 chown rabbitmq:rabbitmq /var/lib/rabbitmq/.erlang.cookie
 
 rabbitmq-server -detached
+PID=$!
 
 if [ -n "$RABBITMQ_JOIN_CLUSTER" ] && [ -n "$RABBIT_TO_JOIN" ]; then
     echo "Cluster members found, will try to join cluster!"
@@ -43,7 +44,6 @@ if [ -n "$RABBITMQ_JOIN_CLUSTER" ] && [ -n "$RABBIT_TO_JOIN" ]; then
     rabbitmqctl cluster_status
 fi
 
-PID=$!
 wait $PID
 trap - TERM INT
 wait $PID

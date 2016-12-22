@@ -20,7 +20,9 @@ RUN echo "-----------------Install Consul-----------------" &&\
     rm -r dist consul_0.7.1_linux_amd64.zip consul_0.7.1_web_ui.zip
 
 
-# Add scripts
-ADD run.sh /run.sh
 
-CMD ["/run.sh"]
+# Add scripts
+COPY run.sh /usr/local/bin/
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["run.sh"]
