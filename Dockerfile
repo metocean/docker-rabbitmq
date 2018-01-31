@@ -10,16 +10,10 @@ RUN apt-get update --fix-missing && \
 RUN echo "-----------------Install Consul-----------------" &&\
     cd /tmp &&\
     mkdir /consul &&\
-    wget -q https://releases.hashicorp.com/consul/0.7.1/consul_0.7.1_linux_amd64.zip &&\
-    wget -q https://releases.hashicorp.com/consul/0.7.1/consul_0.7.1_web_ui.zip &&\
-    unzip consul_0.7.1_linux_amd64.zip &&\
-    unzip -d dist consul_0.7.1_web_ui.zip &&\
+    wget -q https://releases.hashicorp.com/consul/1.0.3/consul_1.0.3_linux_amd64.zip &&\
+    unzip consul_1.0.3_linux_amd64.zip &&\
     mv consul /usr/bin &&\
-    mkdir -p /var/www/consul &&\
-    mv dist/* /var/www/consul/ &&\
-    rm -r dist consul_0.7.1_linux_amd64.zip consul_0.7.1_web_ui.zip
-
-
+    rm -r consul_1.0.3_linux_amd64.zip
 
 # Add scripts
 COPY run.sh /usr/local/bin/
