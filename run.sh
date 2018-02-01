@@ -16,7 +16,7 @@ if [ "$(ls -A $CONSULDIR)" ]; then
   }
 }
 EOF
-    consul agent -data-dir=$CONSULDATA -config-dir=$CONSULDIR &
+    consul agent -data-dir=$CONSULDATA -config-dir=$CONSULDIR $CONSULOPTS &
     sleep 3
 fi
 
