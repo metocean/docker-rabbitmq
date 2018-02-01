@@ -11,7 +11,6 @@ if [ "$(ls -A $CONSULDIR)" ]; then
   "service": {
     "name": "${RABBITMQ_CLUSTER_MEMBER:-rabbit1}",
     "port": 5672,
-    "terminate_on_leave": true,
     "checks": [{"script": "rabbitmqctl status",
                 "interval": "10s"}]
   }
