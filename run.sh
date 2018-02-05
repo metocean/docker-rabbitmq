@@ -13,7 +13,7 @@ if [ -n "$(ls -A $CONSULDIR)" ]; then
 {
   "service": {
     "name": "$RABBITMQ_CONSUL_SERVICE",
-    "tags" : ["$RABBITMQ_CLUSTER_MEMBER","`hostname`"],
+    "tags" : ["$RABBITMQ_CLUSTER_MEMBER"],
     "port": 5672,
     "checks": [{"script": "rabbitmqctl status",
                 "interval": "10s"}]
