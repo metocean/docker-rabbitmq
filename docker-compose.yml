@@ -1,12 +1,11 @@
 version: '2'
 services:
     consul:
-        build: .
-        image: rabbitmq
+        image: consul:1.0.3
         network_mode: host
-        volumes:
-            - /tmp/consul:/tmp/consul
-        command: consul agent -server -bootstrap -ui-dir=/var/www/consul -data-dir=/tmp/consul -advertise=172.17.0.1
+        environment:
+            CONSUL_BIND_INTERFACE: docker0
+        command: agent -dev
 
     rabbit1:
         build: .
@@ -21,12 +20,13 @@ services:
             - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
             - ./consul-join.json:/consul/join.json
             - ./consul-client.json:/consul/client.json
+            - ./run.sh:/usr/local/bin/run.sh
         hostname: rabbit1
         environment:
+            RABBITMQ_CLUSTER_MEMBER: rabbit1
+            RABBITMQ_CONSUL_SERVICE: test-rabbit
             RABBITMQ_DEFAULT_PASS: guest
             RABBITMQ_DEFAULT_USER: guest
-            RABBITMQ_CLUSTER_MEMBER: rabbit1
-            RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
             RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
 
     rabbit2:
@@ -37,15 +37,35 @@ services:
         depends_on:
             - consul
         ports:
-            - "15675:15672"
+            - "15673:15672"
         volumes:
             - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
             - ./consul-join.json:/consul/join.json
             - ./consul-client.json:/consul/client.json
-        hostname: rabbit2
+            - ./run.sh:/usr/local/bin/run.sh
+        #hostname: rabbit2
+        environment:
+            RABBITMQ_CLUSTER_MEMBER: rabbit2
+            RABBITMQ_CONSUL_SERVICE: test-rabbit
+            RABBITMQ_DEFAULT_PASS: guest
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
+
+    rabbit3:
+        build: .
+        image: rabbitmq
+        network_mode: bridge
+        dns: 127.0.0.1
+        depends_on:
+            - consul
+        ports:
+            - "15672:15672"
+        volumes:
+            - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
+            - ./consul-join.json:/consul/join.json
+            - ./consul-client.json:/consul/client.json
+            - ./run.sh:/usr/local/bin/run.sh
         environment:
             RABBITMQ_DEFAULT_PASS: guest
             RABBITMQ_DEFAULT_USER: guest
-            RABBITMQ_CLUSTER_MEMBER: rabbit2
-            RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
             RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63

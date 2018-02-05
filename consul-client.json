@@ -1,6 +1,7 @@
 {
   "ports": { "dns": 53 },
-  "recursor": "8.8.8.8",
+  "recursors": ["8.8.8.8"],
+  "enable_script_checks": true,
   "dns_config": {"allow_stale": true,
                  "max_stale": "60s"}
 
