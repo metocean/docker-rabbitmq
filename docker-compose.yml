@@ -1,51 +1,26 @@
 version: '2'
 services:
     consul:
-        build: .
-        image: rabbitmq
-        network_mode: host
-        volumes:
-            - /tmp/consul:/tmp/consul
-        command: consul agent -server -bootstrap -ui-dir=/var/www/consul -data-dir=/tmp/consul -advertise=172.17.0.1
-
-    rabbit1:
-        build: .
-        image: rabbitmq
-        network_mode: bridge
-        dns: 127.0.0.1
-        depends_on:
-            - consul
+        image: consul
+        hostname: consul
+        networks: 
+            - rabbitmq
         ports:
-            - "15674:15672"
+            - "8400:8400"
+            - "8500:8500"
+            - "8600:53"
+
+    rabbit:
+        image: rabbitmq:3.7
+        networks: 
+            - rabbitmq
         volumes:
-            - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
-            - ./consul-join.json:/consul/join.json
-            - ./consul-client.json:/consul/client.json
-        hostname: rabbit1
+            - ./config/:/etc/rabbitmq/
         environment:
             RABBITMQ_DEFAULT_PASS: guest
             RABBITMQ_DEFAULT_USER: guest
-            RABBITMQ_CLUSTER_MEMBER: rabbit1
-            RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
             RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
+        command: sh -c "sleep 3; rabbitmq-server;" 
 
-    rabbit2:
-        build: .
-        image: rabbitmq
-        network_mode: bridge
-        dns: 127.0.0.1
-        depends_on:
-            - consul
-        ports:
-            - "15675:15672"
-        volumes:
-            - /tmp/rabbitmq:/var/lib/rabbitmq/mnesia
-            - ./consul-join.json:/consul/join.json
-            - ./consul-client.json:/consul/client.json
-        hostname: rabbit2
-        environment:
-            RABBITMQ_DEFAULT_PASS: guest
-            RABBITMQ_DEFAULT_USER: guest
-            RABBITMQ_CLUSTER_MEMBER: rabbit2
-            RABBITMQ_JOIN_CLUSTER: "rabbit1,rabbit2"
-            RABBITMQ_ERLANG_COOKIE: 822453e5-67e4-4edc-999e-5e0827a43c63
+networks:
+    rabbitmq:
